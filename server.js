@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 const mqtt = require('mqtt');
 const moment = require('moment');
-const altura= 300;
+const altura= 190;
 let contadorLectura = 0;
 let lecturaAnterior = 0;
 let promedio = [];
@@ -67,7 +67,7 @@ const options = {
     clean: true, // retain session
     connectTimeout: 4000, // Timeout period
     // Authentication information
-    clientId: 'emqx_test13',
+    clientId: 'backend_servicio',
     username: 'admin',
     password: 'admin',
 }
@@ -87,18 +87,32 @@ client.on('message', (topic, message) => {
     //console.log('receive message：', message.toString())
     const lectura = JSON.parse(new TextDecoder("utf-8").decode(message));
     const nivel = getNivel(lectura.distancia, altura);
+    const litros= lectura.Litros;
+    const LxM= lectura.LxM;
     pushData(nivel);
     const p = getPromedio();
+    const ahora= moment().format("YYYY-MM-DD HH:mm:ss");
     console.log(`Nivel: ${p}`);
     if (p > 0) {
         connection.query('INSERT INTO nivel SET ?', {
             id_tanque: 10,
             nivel: p,
-            fechahora: moment().format("YYYY-MM-DD HH:mm:ss")
+            fechahora: ahora,
         }, function(error, results, fields) {
             if (error) throw error;
             console.log(results.insertId);
         });
+    }
+    if(litros > 0){
+        connection.query('INSERT INTO caudal SET ?',{
+            id_sensor: 2,
+            litros: litros,
+            litroxm: LxM,
+            fechahora: ahora;
+        },function(error, results, fields){
+            if(error) throw error;
+            console.log(results.insertId);
+        })
     }
 })
 client.on('close', function() {
