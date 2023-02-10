@@ -71,7 +71,7 @@ const options = {
     username: 'admin',
     password: 'admin',
 }
-const connectUrl = 'ws://192.168.190.76:8083/mqtt';
+const connectUrl = 'ws://181.174.200.66:8083/mqtt';
 const client = mqtt.connect(connectUrl, options)
 client.on('connect', () => {
     console.log(`Cliente ${options.username} conectado`);

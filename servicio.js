@@ -4,7 +4,7 @@ var Service = require('node-windows').Service;
 var svc = new Service({
   name:'Nivelagua MQTT A MYSQL',
   description: 'Servicio para guardar lectura sensor.',
-  script: 'C:\\nivelagua\\backend\\server.js',
+  script: require('path').join(__dirname,'server.js'),
   nodeOptions: [
     '--harmony',
     '--max_old_space_size=4096'
