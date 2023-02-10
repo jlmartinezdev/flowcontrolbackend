@@ -34,14 +34,15 @@ const pushData = (data) => {
 const getNivel = (lectura, altura) => {
     contadorLectura++;
     var nivel = 0;
-    var distanciaMin = 20;
-    if (lectura > altura) {
-        lectura = altura;
+    const distanciaMin = 68;
+
+    if ((lectura -distanciaMin) > altura) {
+        lectura = altura+ distanciaMin;
     }
     if (lectura > distanciaMin) {
         nivel = 100 - ((lectura - distanciaMin) * 100) / altura;
     } else {
-        nivel = 100;
+        nivel = 101;
     }
     if (nivel < 1) {
         nivel = 0;
