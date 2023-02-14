@@ -5,7 +5,7 @@ const altura= 190;
 let contadorLectura = 0;
 let lecturaAnterior = 0;
 let promedio = [];
-
+let esperar = false;
 // Obtener promedio de lectura
 const getPromedio = () => {
     if (promedio.length == 10) {
@@ -89,33 +89,37 @@ client.on('message', (topic, message) => {
     try{
         const lectura = JSON.parse(new TextDecoder("utf-8").decode(message));
         const nivel = getNivel(lectura.distancia, altura);
-        const litros= lectura.Litros;
+        const litros= lectura.Litro;
         const LxM= lectura.LxM;
         pushData(nivel);
         const p = getPromedio();
         const ahora= moment().format("YYYY-MM-DD HH:mm:ss");
         console.log(`Nivel: ${p}`);
-        if (p > 0) {
-            connection.query('INSERT INTO nivel SET ?', {
-                id_tanque: 10,
-                nivel: p,
-                fechahora: ahora,
-            }, function(error, results, fields) {
-                if (error) throw error;
-                console.log(results.insertId);
-            });
+        if (!esperar){
+            if (p > 0) {
+                connection.query('INSERT INTO nivel SET ?', {
+                    id_tanque: 10,
+                    nivel: p,
+                    fechahora: ahora,
+                }, function(error, results, fields) {
+                    if (error) throw error;
+                    console.log(results.insertId);
+                    checkInterval();
+                });
+            }
+            if(litros > 0){
+                connection.query('INSERT INTO caudal SET ?',{
+                    id_sensor: 2,
+                    litros: litros,
+                    litroxm: LxM,
+                    fechahora: ahora,
+                },function(error, results, fields){
+                    if(error) throw error;
+                    console.log(results.insertId);
+                })
+            }
         }
-        if(litros > 0){
-            connection.query('INSERT INTO caudal SET ?',{
-                id_sensor: 2,
-                litros: litros,
-                litroxm: LxM,
-                fechahora: ahora,
-            },function(error, results, fields){
-                if(error) throw error;
-                console.log(results.insertId);
-            })
-        }
+        
     }cath(error){
         console.log(error.toString());
     }
@@ -124,3 +128,9 @@ client.on('message', (topic, message) => {
 client.on('close', function() {
     console.log('Desconectado...')
 })
+const checkInterval= () =>{
+    esperar= true;
+    setTimeout(()=>{
+        esperar= false;
+    },1000);
+}
