@@ -8,6 +8,7 @@ let litroAnterior= 0;
 let promedio = [];
 let esperar = false;
 let tendencia= cargando;
+let contadorLectura= 0;
 let litroPlus=0;
 // Obtener promedio de lectura
 const getPromedio = () => {
