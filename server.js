@@ -12,12 +12,12 @@ let contadorLectura= 0;
 let litroPlus=0;
 // Obtener promedio de lectura
 const getPromedio = () => {
-    if (promedio.length == 20) {
+    if (promedio.length == 30) {
         let total = 0;
         for (var i = promedio.length - 1; i >= 0; i--) {
             total += promedio[i];
         }
-        total = total / 20;
+        total = total / 30;
         return Math.trunc(total);
     } else {
         return 0;
@@ -29,7 +29,7 @@ const getTendencia= ()=>{
 
 //Agregar datos al arreglo de 10 elementos
 const pushData = (data) => {
-    if (promedio.length < 20) {
+    if (promedio.length < 30) {
         promedio.push(data);
     } else {
         promedio = [];
@@ -117,7 +117,7 @@ client.on('message', (topic, message) => {
                     checkInterval();
                 });
             }
-            if(litros > 0 && (parseInt(litros) - parseInt(litroAnterior)) > 50){
+            if(litros > 0 && (parseInt(litros) - parseInt(litroAnterior)) > 100){
                 connection.query('INSERT INTO caudal SET ?',{
                     id_sensor: 2,
                     litros: litros,
