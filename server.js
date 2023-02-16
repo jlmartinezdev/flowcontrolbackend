@@ -61,7 +61,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     database: 'nagua',
     user: 'root',
-    password: '2792320'
+    password: ''
 });
 connection.connect(function(error) {
     if (error) {
