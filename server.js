@@ -2,27 +2,33 @@ const mysql = require('mysql');
 const mqtt = require('mqtt');
 const moment = require('moment');
 const altura= 190;
-let contadorLectura = 0;
-let lecturaAnterior = 0;
+const cargando= true;
+const descargando=  false;
+let litroAnterior= 0;
 let promedio = [];
 let esperar = false;
+let tendencia= cargando;
+let litroPlus=0;
 // Obtener promedio de lectura
 const getPromedio = () => {
-    if (promedio.length == 10) {
+    if (promedio.length == 20) {
         let total = 0;
         for (var i = promedio.length - 1; i >= 0; i--) {
             total += promedio[i];
         }
-        total = total / 10;
+        total = total / 20;
         return Math.trunc(total);
     } else {
         return 0;
     }
 }
+const getTendencia= ()=>{
+
+}
 
 //Agregar datos al arreglo de 10 elementos
 const pushData = (data) => {
-    if (promedio.length < 10) {
+    if (promedio.length < 20) {
         promedio.push(data);
     } else {
         promedio = [];
@@ -90,6 +96,9 @@ client.on('message', (topic, message) => {
         const lectura = JSON.parse(new TextDecoder("utf-8").decode(message));
         const nivel = getNivel(lectura.distancia, altura);
         const litros= lectura.Litro;
+        if(litroAnterior==0) {
+            litroAnterior= litros;
+        }
         const LxM= lectura.LxM;
         pushData(nivel);
         const p = getPromedio();
@@ -107,7 +116,7 @@ client.on('message', (topic, message) => {
                     checkInterval();
                 });
             }
-            if(litros > 0){
+            if(litros > 0 && (litros - litroAnterior) > 50){
                 connection.query('INSERT INTO caudal SET ?',{
                     id_sensor: 2,
                     litros: litros,
@@ -120,7 +129,7 @@ client.on('message', (topic, message) => {
             }
         }
         
-    }cath(error){
+    }catch(error){
         console.log(error.toString());
     }
     
@@ -133,4 +142,9 @@ const checkInterval= () =>{
     setTimeout(()=>{
         esperar= false;
     },1000);
+}
+const checkLectura= (actual)=>{
+    if((litroAnterior -actual)<1000){
+        litroPlus= litroAnterior;
+    }
 }
