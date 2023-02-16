@@ -117,7 +117,7 @@ client.on('message', (topic, message) => {
                     checkInterval();
                 });
             }
-            if(litros > 0 && (litros - litroAnterior) > 50){
+            if(litros > 0 && (parseInt(litros) - parseInt(litroAnterior)) > 50){
                 connection.query('INSERT INTO caudal SET ?',{
                     id_sensor: 2,
                     litros: litros,
@@ -126,6 +126,7 @@ client.on('message', (topic, message) => {
                 },function(error, results, fields){
                     if(error) throw error;
                     console.log(results.insertId);
+                    litroAnterior= litros;
                 })
             }
         }
