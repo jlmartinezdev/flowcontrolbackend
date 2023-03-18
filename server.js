@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const mqtt = require('mqtt');
 const moment = require('moment');
+const schedule = require('node-schedule');
 const altura= 190;
 const cargando= true;
 const descargando=  false;
@@ -10,6 +11,7 @@ let esperar = false;
 let tendencia= cargando;
 let contadorLectura= 0;
 let litroPlus=0;
+let isConected= false;
 // Obtener promedio de lectura
 const getPromedio = () => {
     if (promedio.length == 30) {
@@ -84,11 +86,14 @@ const client = mqtt.connect(connectUrl, options)
 client.on('connect', () => {
     console.log(`Cliente ${options.username} conectado`);
     client.subscribe('S_T_AGUA', function(err) {})
+    isConected= true;
 })
 client.on('reconnect', () => {
+    isConected= false;
     console.log('Reconectando...')
 })
 client.on('error', (error) => {
+    isConected= false;
     console.log('Connection failed:', error)
 })
 client.on('message', (topic, message) => {
@@ -150,3 +155,10 @@ const checkLectura= (actual)=>{
         litroPlus= litroAnterior;
     }
 }
+const job = schedule.scheduleJob('* 0 * * *', function(){
+    console.log('Resetear contador lectura ESP');
+    if(isConected){
+     client.publish("update_es","R");   
+    }
+  });
+  

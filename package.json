@@ -12,6 +12,7 @@
     "moment": "^2.29.4",
     "mqtt": "^4.3.7",
     "mysql": "^2.18.1",
+    "node-schedule": "^2.1.1",
     "precompiled-mqtt": "^4.3.14-beta"
   }
 }
